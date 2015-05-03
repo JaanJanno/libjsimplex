@@ -2,40 +2,46 @@ package ee.jjanno.libjsimplex.noise.gpu;
 
 import com.amd.aparapi.Kernel;
 
-class SimplexNoiseGpu2DKernel extends Kernel {
+class SimplexNoiseGpu2DKernelOctaved extends Kernel {
 
 	private float[] argsFloat = { 0, 0, 0 };
 	private int[] argsInt = { 0, 0 };
+	private float[] r = { 0 };
+	private float[] argsWeight = { 1 };
 
-	private float[] r = new float[1];
-
-	public SimplexNoiseGpu2DKernel() {
+	public SimplexNoiseGpu2DKernelOctaved() {
 		super();
 		for (int i = 0; i < 512; i++) {
 			permMod12[i] = (short) (perm[i] % 12);
 		}
 	}
-
+	
 	@Override
 	public void run() {
 		int i = getGlobalId();
 		int x = i % argsInt[0];
 		int y = i / argsInt[0];
-		r[i] = noise(argsFloat[0] + argsFloat[2] * x, argsFloat[1]
-				+ argsFloat[2] * y);
+		float accumulator = 0;
+
+		for (int j = 0; j < argsInt[2]; j++) {
+			float power = pow(2, j);
+			float newFrequency = argsFloat[2] * power;
+
+			accumulator += noise(argsFloat[0] * power + newFrequency * x,
+					argsFloat[1] * power + newFrequency * y, j);
+		}
+		r[i] = accumulator;
 	}
 
 	public float[] getResult() {
 		return r;
 	}
 
-	public void setParameters(float x, float y, int width, int height,
-			float frequency) {
-		argsFloat[0] = x;
-		argsFloat[1] = y;
-		argsInt[0] = width;
-		argsInt[1] = height;
-		argsFloat[2] = frequency;
+	public void setParameters(float x, float y, int width,
+			int height, float frequency, float[] weight) {
+		argsWeight = weight;
+		argsFloat = new float[] { x, y, frequency };
+		argsInt = new int[] { width, height, weight.length };
 		r = new float[width * height];
 	}
 
@@ -90,7 +96,7 @@ class SimplexNoiseGpu2DKernel extends Kernel {
 		return gx * x + gy * y;
 	}
 
-	public float noise(float xin, float yin) {
+	public float noise(float xin, float yin, int index) {
 		float n0 = 0f, n1 = 0f, n2 = 0f;
 		int i1 = 0, j1 = 0;
 		float s = (xin + yin) * 0.3660254037844386f;
@@ -139,7 +145,7 @@ class SimplexNoiseGpu2DKernel extends Kernel {
 			t2 *= t2;
 			n2 = t2 * t2 * dot(grad3[gi2 * 2], grad3[gi2 * 2 + 1], x2, y2);
 		}
-		return 70.0f * (n0 + n1 + n2);
+		return 70.0f * (n0 + n1 + n2) * argsWeight[index];
 	}
 
 }

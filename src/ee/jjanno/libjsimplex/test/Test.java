@@ -1,44 +1,46 @@
 package ee.jjanno.libjsimplex.test;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import ee.jjanno.libjsimplex.noise.gpu.SimplexNoiseGpu2D;
-import ee.jjanno.libjsimplex.noise.gpu.SimplexNoiseGpu3D;
-import ee.jjanno.libjsimplex.noise.gpu.SimplexNoiseGpu4D;
+import ee.jjanno.libjsimplex.generator.NoiseSurface;
+import ee.jjanno.libjsimplex.util.colorizer.ColorMapper;
 import ee.jjanno.libjsimplex.util.colorizer.Grayscale;
 
 public class Test extends JPanel {
 
 	private static final long serialVersionUID = -4138498611856148174L;
 
-	SimplexNoiseGpu4D n = new SimplexNoiseGpu4D();
-	SimplexNoiseGpu3D n3 = new SimplexNoiseGpu3D();
-	SimplexNoiseGpu2D n2 = new SimplexNoiseGpu2D();
 	Grayscale gs = new Grayscale();
+	ColorMapper m = new ColorMapper();
 
 	// Set the number of dimensions calculated. 2,3 and 4 possible.
-	int mode = 4;
+	int mode = 5;
 
 	float xc = 0;
 	float yc = 0;
+	float zc = 0;
+	float wc = 0;
 
-	float zoom = 0.001f;
+	static int xRes = 1024;
+	static int yRes = 1024;
 
-	BufferedImage imgB = new BufferedImage(1024, 1024,
-			BufferedImage.TYPE_INT_RGB);
-	WritableRaster raster = (WritableRaster) imgB.getRaster();
+	float zoom = 0.002f;
 
 	public Test(String title) {
 		super();
 		addKeyListener(new Nuputaja(this));
 		setFocusable(true);
+
+		for (int i = 0; i < 10; i++) {
+			m.addRange(-1 + i * 0.2f, -1 + i * 0.2f + 0.2f, new Color(155, 95,
+					0), new Color(65, 45, 0), 2);
+		}
 	}
 
 	public static void main(String[] args) {
@@ -47,41 +49,20 @@ public class Test extends JPanel {
 		f.setSize(1024, 1024);
 		f.setLocation(100, 100);
 		f.setTitle("SimplexTest");
-		f.add(new Test(""));
+		Test t = new Test("");
+		f.add(t);
 		f.setVisible(true);
+
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
-
-		long a;
-		float[] img = null;
-		
-		switch (mode) {
-		case 2:
-			a = System.nanoTime();
-			img = n2.calculate(15.5f + xc, 5.5f + yc, 1024, 1024,
-					zoom);
-			System.out.println(System.nanoTime() - a);
-			break;
-		case 3:
-			a = System.nanoTime();
-			img = n3.calculate(15.5f + xc, 5.5f + yc, 0f, 1024, 1024,
-					1, zoom);
-			System.out.println(System.nanoTime() - a);
-			break;
-		case 4:
-			a = System.nanoTime();
-			img = n.calculate(15.5f + xc, 5.5f + yc, 0, 0, 1024,
-					1024, 1, 1, zoom);
-			System.out.println(System.nanoTime() - a);
-			break;
-		}
-
-		float[] imgF = gs.getGrayscaleRGBArray(img);
-		raster.setPixels(0, 0, 1024, 1024, imgF);
-		imgB.setData(raster);
-		g.drawImage(imgB, 0, 0, null);
+		long a = System.nanoTime();
+		float[] img2 = NoiseSurface.generate2dRawOctaved(15.5f + xc,
+				5.5f + yc, xRes, yRes, zoom * 2, 0.5, 2, true);
+		System.out.println((System.nanoTime() - a) / 1000000);
+		g.drawImage(m.getBufferedImage(img2, xRes, yRes), 0, 0, 1024, 1024,
+				null);
 	}
 
 	private class Nuputaja extends KeyAdapter {
@@ -112,6 +93,18 @@ public class Test extends JPanel {
 			}
 			if (key == KeyEvent.VK_X) {
 				zoom *= 5.0f;
+			}
+			if (key == KeyEvent.VK_A) {
+				m.zc += mul * zoom / 8;
+			}
+			if (key == KeyEvent.VK_S) {
+				m.zc -= mul * zoom / 8;
+			}
+			if (key == KeyEvent.VK_Q) {
+				m.wc += mul * zoom / 8;
+			}
+			if (key == KeyEvent.VK_W) {
+				m.wc -= mul * zoom / 8;
 			}
 
 			m.repaint();

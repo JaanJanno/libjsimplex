@@ -2,25 +2,22 @@ package ee.jjanno.libjsimplex.noise.gpu;
 
 import com.amd.aparapi.Kernel;
 
-class SimplexNoiseGpu3DKernel extends Kernel {
+class SimplexNoiseGpu3DKernelOctaved extends Kernel {
 
 	private float[] argsFloat = { 0, 0, 0, 0 };
-	private int[] argsInt = { 0, 0, 0 };
+	private int[] argsInt = { 0, 0, 0, 0 };
 	private float[] r = {0};
+	private float[] argsWeight = { 1 };
 
 	public float[] getResult() {
 		return r;
 	}
 
-	public void setParameters(float x, float y, float z, int width, int height,
-			int depth, float frequency) {
-		argsFloat[0] = x;
-		argsFloat[1] = y;
-		argsFloat[2] = z;
-		argsInt[0] = width;
-		argsInt[1] = height;
-		argsInt[2] = depth;
-		argsFloat[3] = frequency;
+	public void setParameters(float x, float y, float z, int width,
+			int height, int depth, float frequency, float[] weight) {
+		argsWeight = weight;
+		argsFloat = new float[] { x, y, z, frequency };
+		argsInt = new int[] { width, height, depth, weight.length };
 		r = new float[width * height * depth];
 	}
 
@@ -30,8 +27,18 @@ class SimplexNoiseGpu3DKernel extends Kernel {
 		int x = i % argsInt[0];
 		int y = (i % (argsInt[0] * argsInt[1])) / (argsInt[1]);
 		int z = i / (argsInt[0] * argsInt[1]);
-		r[i] = noise(argsFloat[0] + x * argsFloat[3], argsFloat[1] + y
-				* argsFloat[3], argsFloat[2] + z * argsFloat[3]);
+		
+		float accumulator = 0;
+
+		for (int j = 0; j < argsInt[3]; j++) {
+			float power = pow(2, j);
+			float newFrequency = argsFloat[3] * power;
+
+			accumulator += noise(argsFloat[0] * power + newFrequency * x,
+					argsFloat[1] * power + newFrequency * y, argsFloat[2]
+							* power + newFrequency * z, j);
+		}
+		r[i] = accumulator;
 	}
 
 	private float grad3[] = { 1, 1, 0, -1, 1, 0, 1, -1, 0, -1, -1, 0, 1, 0, 1,
@@ -77,7 +84,7 @@ class SimplexNoiseGpu3DKernel extends Kernel {
 
 	private short permMod12[] = new short[512];
 
-	public SimplexNoiseGpu3DKernel() {
+	public SimplexNoiseGpu3DKernelOctaved() {
 		for (int i = 0; i < 512; i++) {
 			permMod12[i] = (short) (perm[i] % 12);
 		}
@@ -93,7 +100,7 @@ class SimplexNoiseGpu3DKernel extends Kernel {
 		return gx * x + gy * y + gz * z;
 	}
 
-	public float noise(float xin, float yin, float zin) {
+	public float noise(float xin, float yin, float zin, int index) {
 		float n0 = 0f, n1 = 0f, n2 = 0f, n3 = 0f;
 		float s = (xin + yin + zin) * 0.3333333333333333f;
 
@@ -219,7 +226,7 @@ class SimplexNoiseGpu3DKernel extends Kernel {
 					* dot(grad3[3 * gi3], grad3[3 * gi3 + 1],
 							grad3[3 * gi3 + 2], x3, y3, z3);
 		}
-		return 32.0f * (n0 + n1 + n2 + n3);
+		return 32.0f * (n0 + n1 + n2 + n3) * argsWeight[index];
 	}
 
 }

@@ -12,7 +12,7 @@ import ee.jjanno.libjsimplex.generator.NoiseSurface;
 import ee.jjanno.libjsimplex.util.colorizer.ColorMapper;
 import ee.jjanno.libjsimplex.util.colorizer.Grayscale;
 
-public class Test extends JPanel {
+public class TestTexture extends JPanel {
 
 	private static final long serialVersionUID = -4138498611856148174L;
 
@@ -30,16 +30,18 @@ public class Test extends JPanel {
 	static int xRes = 1024;
 	static int yRes = 1024;
 
-	float zoom = 0.002f;
+	float zoom = 0.0015f;
 
-	public Test(String title) {
+	public TestTexture(String title) {
 		super();
 		addKeyListener(new Nuputaja(this));
 		setFocusable(true);
 
-		for (int i = 0; i < 10; i++) {
-			m.addRange(-1 + i * 0.2f, -1 + i * 0.2f + 0.2f, new Color(155, 95,
-					0), new Color(65, 45, 0), 2);
+		for (int i = 0; i < 20; i++) {
+			m.addRange(-1 + i * 0.1f, -1 + i * 0.1f + 0.09f, new Color(135, 75,
+					0), new Color(65, 45, 0), 1);
+			m.addRange(-1 + i * 0.1f, -1 + i * 0.1f + 0.1f, new Color(135, 75,
+					0), new Color(65, 45, 0), 1);
 		}
 	}
 
@@ -49,7 +51,7 @@ public class Test extends JPanel {
 		f.setSize(1024, 1024);
 		f.setLocation(100, 100);
 		f.setTitle("SimplexTest");
-		Test t = new Test("");
+		TestTexture t = new TestTexture("");
 		f.add(t);
 		f.setVisible(true);
 
@@ -58,8 +60,8 @@ public class Test extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		long a = System.nanoTime();
-		float[] img2 = NoiseSurface.generate2dRawOctaved(15.5f + xc,
-				5.5f + yc, xRes, yRes, zoom * 2, 0.5, 2, true);
+		float[] img2 = NoiseSurface.generate2dRawFrom4dOctaved(15.5f + xc,
+				5.5f + yc, 0, 0, xRes, yRes, zoom * 2, 0.5, 10, true);
 		System.out.println((System.nanoTime() - a) / 1000000);
 		g.drawImage(m.getBufferedImage(img2, xRes, yRes), 0, 0, 1024, 1024,
 				null);
@@ -67,10 +69,10 @@ public class Test extends JPanel {
 
 	private class Nuputaja extends KeyAdapter {
 
-		private Test m;
+		private TestTexture m;
 		final private float mul = 30.0f;
 
-		public Nuputaja(Test m) {
+		public Nuputaja(TestTexture m) {
 			this.m = m;
 		}
 

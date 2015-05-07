@@ -29,7 +29,7 @@ public class TestAnimation extends JPanel {
 	static int xRes = 1024;
 	static int yRes = 1024;
 
-	static float zoom = 0.003f;
+	static float zoom = 0.006f;
 
 	public BufferedImage[] images = new BufferedImage[n];
 	BufferedImage image = null;
@@ -58,7 +58,7 @@ public class TestAnimation extends JPanel {
 	}
 
 	void addImage(float w, float z, int index) {
-		float[] img = NoiseSurface.generate2dRawFrom4dOctaved(0, 0, z * 0.05f, w * 0.05f, xRes, yRes, zoom, 0.5, 3, true);
+		float[] img = NoiseSurface.generate2dRawFrom4dOctaved(0, 0, z * 0.05f, w * 0.05f, xRes, yRes, zoom, 0.6, 4, true);
 		images[index] = m.getBufferedImage(img, xRes, yRes);
 	}
 

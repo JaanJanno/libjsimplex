@@ -60,9 +60,9 @@ class SimplexNoiseGpu2DKernelIntNoisedOctaved extends Kernel {
 		float y2 = y0 - 1.0f + 2.0f * 0.21132486540518713f;
 		int ii = i & 255;
 		int jj = j & 255;
-		int gi0 = intNoise(ii + intNoise(jj)) % 12;
-		int gi1 = intNoise(ii + i1 + intNoise(jj + j1)) % 12;
-		int gi2 = intNoise(ii + 1 + intNoise(jj + 1)) % 12;
+		int gi0 = permMod12[ii + intNoise(jj)];
+		int gi1 = permMod12[ii + i1 + intNoise(jj + j1)];
+		int gi2 = permMod12[ii + 1 + intNoise(jj + 1)];
 		float t0 = 0.5f - x0 * x0 - y0 * y0;
 		if (t0 < 0)
 			n0 = 0.0f;

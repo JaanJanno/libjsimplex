@@ -15,11 +15,11 @@ class SimplexNoiseGpu4DKernelIntNoisedOctaved extends Kernel {
 		return ((n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff & 255);
 	}
 
-	private short permMod12[] = new short[512];
+	private short permMod32[] = new short[512];
 
 	public SimplexNoiseGpu4DKernelIntNoisedOctaved() {
 		for (int i = 0; i < 512; i++) {
-			permMod12[i] = (short) (perm[i] % 12);
+			permMod32[i] = (short) (perm[i] % 32);
 		}
 	}
 
@@ -122,15 +122,15 @@ class SimplexNoiseGpu4DKernelIntNoisedOctaved extends Kernel {
 		int jj = j & 255;
 		int kk = k & 255;
 		int ll = l & 255;
-		int gi0 = intNoise(ii + intNoise(jj + intNoise(kk + intNoise(ll)))) % 32;
-		int gi1 = intNoise(ii + i1
-				+ intNoise(jj + j1 + intNoise(kk + k1 + intNoise(ll + l1)))) % 32;
-		int gi2 = intNoise(ii + i2
-				+ intNoise(jj + j2 + intNoise(kk + k2 + intNoise(ll + l2)))) % 32;
-		int gi3 = intNoise(ii + i3
-				+ intNoise(jj + j3 + intNoise(kk + k3 + intNoise(ll + l3)))) % 32;
-		int gi4 = intNoise(ii + 1
-				+ intNoise(jj + 1 + intNoise(kk + 1 + intNoise(ll + 1)))) % 32;
+		int gi0 = permMod32[ii + intNoise(jj + intNoise(kk + intNoise(ll)))];
+		int gi1 = permMod32[ii + i1
+				+ intNoise(jj + j1 + intNoise(kk + k1 + intNoise(ll + l1)))];
+		int gi2 = permMod32[ii + i2
+				+ intNoise(jj + j2 + intNoise(kk + k2 + intNoise(ll + l2)))];
+		int gi3 = permMod32[ii + i3
+				+ intNoise(jj + j3 + intNoise(kk + k3 + intNoise(ll + l3)))];
+		int gi4 = permMod32[ii + 1
+				+ intNoise(jj + 1 + intNoise(kk + 1 + intNoise(ll + 1)))];
 
 		float t0 = 0.6f - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
 		if (t0 < 0)

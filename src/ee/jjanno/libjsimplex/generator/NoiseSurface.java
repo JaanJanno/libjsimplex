@@ -6,30 +6,33 @@ import ee.jjanno.libjsimplex.noise.gpu.SimplexNoiseGpu4D;
 
 public class NoiseSurface {
 
-	public static float[] generate2dRaw(float x, float y, int width, int height,
-			float frequency, boolean fast) {
+	public static float[] generate2dRaw(float x, float y, int width,
+			int height, float frequency, boolean fast) {
 		if (fast)
-			return SimplexNoiseGpu2D.calculateFast(x, y, width, height, frequency);
+			return SimplexNoiseGpu2D.calculateFast(x, y, width, height,
+					frequency);
 		else
 			return SimplexNoiseGpu2D.calculate(x, y, width, height, frequency);
 	}
 
-	public static float[] generate2dRawFrom3d(float x, float y, float z, int width,
-			int height, float frequency, boolean fast) {
-		if (fast)
-			return SimplexNoiseGpu3D.calculateFast(x, y, z, width, height, 1, frequency);
-		else
-			return SimplexNoiseGpu3D.calculate(x, y, z, width, height, 1, frequency);
-	}
-
-	public static float[] generate2dRawFrom4d(float x, float y, float z, float w,
+	public static float[] generate2dRawFrom3d(float x, float y, float z,
 			int width, int height, float frequency, boolean fast) {
 		if (fast)
-			return SimplexNoiseGpu4D.calculateFast(x, y, z, w, width, height, 1, 1,
+			return SimplexNoiseGpu3D.calculateFast(x, y, z, width, height, 1,
 					frequency);
 		else
-			return SimplexNoiseGpu4D
-					.calculate(x, y, z, w, width, height, 1, 1, frequency);
+			return SimplexNoiseGpu3D.calculate(x, y, z, width, height, 1,
+					frequency);
+	}
+
+	public static float[] generate2dRawFrom4d(float x, float y, float z,
+			float w, int width, int height, float frequency, boolean fast) {
+		if (fast)
+			return SimplexNoiseGpu4D.calculateFast(x, y, z, w, width, height,
+					1, 1, frequency);
+		else
+			return SimplexNoiseGpu4D.calculate(x, y, z, w, width, height, 1, 1,
+					frequency);
 	}
 
 	public static float[] generate2dRawOctaved(float x, float y, int width,
@@ -37,11 +40,11 @@ public class NoiseSurface {
 			boolean fast) {
 		float[] weights = generateWeights(octaves, persistence);
 		if (fast)
-			return SimplexNoiseGpu2D.calculateFastOctaved(x, y, width, height, 1, 1,
-					frequency, weights);
+			return SimplexNoiseGpu2D.calculateFastOctaved(x, y, width, height,
+					1, 1, frequency, weights);
 		else
-			return SimplexNoiseGpu2D.calculateOctaved(x, y, width, height, 1, 1,
-					frequency, weights);
+			return SimplexNoiseGpu2D.calculateOctaved(x, y, width, height, 1,
+					1, frequency, weights);
 	}
 
 	public static float[] generate2dRawFrom3dOctaved(float x, float y, float z,
@@ -49,11 +52,11 @@ public class NoiseSurface {
 			int octaves, boolean fast) {
 		float[] weights = generateWeights(octaves, persistence);
 		if (fast)
-			return SimplexNoiseGpu3D.calculateFastOctaved(x, y, z, width, height, 1,
-					frequency, weights);
+			return SimplexNoiseGpu3D.calculateFastOctaved(x, y, z, width,
+					height, 1, frequency, weights);
 		else
-			return SimplexNoiseGpu3D.calculateOctaved(x, y, z, width, height, 1,
-					frequency, weights);
+			return SimplexNoiseGpu3D.calculateOctaved(x, y, z, width, height,
+					1, frequency, weights);
 	}
 
 	public static float[] generate2dRawFrom4dOctaved(float x, float y, float z,
@@ -61,11 +64,18 @@ public class NoiseSurface {
 			double persistence, int octaves, boolean fast) {
 		float[] weights = generateWeights(octaves, persistence);
 		if (fast)
-			return SimplexNoiseGpu4D.calculateFastOctaved(x, y, z, w, width, height, 1,
-					1, frequency, weights);
+			return SimplexNoiseGpu4D.calculateFastOctaved(x, y, z, w, width,
+					height, 1, 1, frequency, weights);
 		else
-			return SimplexNoiseGpu4D.calculateOctaved(x, y, z, w, width, height, 1, 1,
-					frequency, weights);
+			return SimplexNoiseGpu4D.calculateOctaved(x, y, z, w, width,
+					height, 1, 1, frequency, weights);
+	}
+
+	public static float[] generate2dTiledOctaved(float x, float y, int width,
+			int height, int xSlices, int ySlices, float frequency, double persistence, int octaves) {
+		float[] weights = generateWeights(octaves, persistence);
+		return SimplexNoiseGpu4D.calculateTiled(x, y, width, height, xSlices, ySlices, frequency,
+				weights);
 	}
 
 	private static float[] generateWeights(int octaves, double persistence) {

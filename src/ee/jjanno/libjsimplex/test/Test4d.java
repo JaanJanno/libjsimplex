@@ -12,7 +12,7 @@ import ee.jjanno.libjsimplex.generator.NoiseSurface;
 import ee.jjanno.libjsimplex.util.colorizer.ColorMapper;
 import ee.jjanno.libjsimplex.util.colorizer.Grayscale;
 
-public class TestTexture extends JPanel {
+public class Test4d extends JPanel {
 
 	private static final long serialVersionUID = -4138498611856148174L;
 
@@ -32,7 +32,7 @@ public class TestTexture extends JPanel {
 
 	float zoom = 0.0015f;
 
-	public TestTexture(String title) {
+	public Test4d(String title) {
 		super();
 		addKeyListener(new Nuputaja(this));
 		setFocusable(true);
@@ -51,7 +51,7 @@ public class TestTexture extends JPanel {
 		f.setSize(1024, 1024);
 		f.setLocation(100, 100);
 		f.setTitle("SimplexTest");
-		TestTexture t = new TestTexture("");
+		Test4d t = new Test4d("");
 		f.add(t);
 		f.setVisible(true);
 
@@ -60,8 +60,8 @@ public class TestTexture extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		long a = System.nanoTime();
-		float[] img2 = NoiseSurface.generate2dRawOctaved(xc, yc, xRes, yRes,
-				zoom * 2, 0.5, 10, true);
+		float[] img2 = NoiseSurface.generate2dTiledOctaved(xc / zoom  / 2, yc / zoom / 2, xRes, yRes, xRes, yRes, zoom*2, 0.5, 10);
+		
 		System.out.println((System.nanoTime() - a) / 1000000);
 		g.drawImage(m.getBufferedImage(img2, xRes, yRes), 0, 0, 1024, 1024,
 				null);
@@ -69,10 +69,10 @@ public class TestTexture extends JPanel {
 
 	private class Nuputaja extends KeyAdapter {
 
-		private TestTexture m;
+		private Test4d m;
 		final private float mul = 30.0f;
 
-		public Nuputaja(TestTexture m) {
+		public Nuputaja(Test4d m) {
 			this.m = m;
 		}
 

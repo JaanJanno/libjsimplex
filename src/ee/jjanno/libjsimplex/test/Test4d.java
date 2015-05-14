@@ -60,7 +60,7 @@ public class Test4d extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		long a = System.nanoTime();
-		float[] img2 = NoiseSurface.generate2dTiledOctaved(xc / zoom  / 2, yc / zoom / 2, xRes, yRes, xRes, yRes, zoom*2, 0.5, 10);
+		float[] img2 = NoiseSurface.generate2dRawTiledOctaved(xc / zoom  / 2, yc / zoom / 2, xRes, yRes, xRes, yRes, zoom*2, 0.5, 10);
 		
 		System.out.println((System.nanoTime() - a) / 1000000);
 		g.drawImage(m.getBufferedImage(img2, xRes, yRes), 0, 0, 1024, 1024,

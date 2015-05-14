@@ -10,6 +10,13 @@ public class ColorMapper {
 
 	List<ColorRange> colorRanges = new ArrayList<ColorRange>();
 
+	/**
+	 * Calculates an RGB array given an array of noise data.
+	 * 
+	 * @param input Array of noise data.
+	 * @return RGB array representing the noise input.
+	 */
+	
 	public float[] getRGBArray(float[][] input) {
 		int width = input[0].length;
 		int height = input.length;
@@ -28,6 +35,13 @@ public class ColorMapper {
 		return output;
 	}
 	
+	/**
+	 * Calculates an RGB array given an array of noise data.
+	 * 
+	 * @param input Array of noise data.
+	 * @return RGB array representing the noise input.
+	 */
+	
 	public float[] getRGBArray(float[] input) {
 		
 		float[] output = new float[input.length*3];
@@ -42,6 +56,13 @@ public class ColorMapper {
 		return output;
 	}
 	
+	/**
+	 * Calculates a BufferedImage given a 2D array of noise data.
+	 * 
+	 * @param input 2D array of noise data.
+	 * @return BufferedImage representing the noise input.
+	 */
+	
 	public BufferedImage getBufferedImage(float[][] input) {
 		int width = input[0].length;
 		int height = input.length;	
@@ -54,6 +75,15 @@ public class ColorMapper {
 		return imgB;
 	}
 	
+	/**
+	 * Calculates a BufferedImage given a 1D array of noise data and the desired image's dimensions.
+	 * 
+	 * @param input Array of noise data.
+	 * @param width Width of the noise surface.
+	 * @param height Height of the noise surface.
+	 * @return
+	 */
+	
 	public BufferedImage getBufferedImage(float[] input, int width, int height) {
 		BufferedImage imgB = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_RGB);
@@ -63,6 +93,16 @@ public class ColorMapper {
 		imgB.setData(raster);
 		return imgB;
 	}
+	
+	/**
+	 * Adds a color range rule used when generating a RGB array of BufferedImage.
+	 * 
+	 * @param lowerLimit Lowest value of noise this rule applies to.
+	 * @param upperLimit Highest value of noise this rule applies to.
+	 * @param lowerColor Color representing the lowest value of noise.
+	 * @param upperColor Color representing the highest value of noise.
+	 * @param contrast Sets contrast of the color range.
+	 */
 	
 	public void addRange(float lowerLimit, float upperLimit, Color lowerColor,
 			Color upperColor, double contrast) {
